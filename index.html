@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraZone - Health, Vitamins & Wellness Marketplace</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            amazonNavy: '#131921',
+            amazonLightNavy: '#232f3e',
+            amazonYellow: '#febd69',
+            amazonOrange: '#f08804',
+            amazonOrangeHover: '#e47911',
+            amazonBlue: '#007185',
+            amazonLink: '#0066c0'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      background-color: #eaeded;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="text-slate-900 antialiased min-h-screen flex flex-col">
+
+  <!-- ================= TOP NAV BAR ================= -->
+  <header class="bg-amazonNavy text-white sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-xs">
+      
+      <!-- Logo -->
+      <a href="javascript:void(0)" onclick="switchView('marketplace')" class="flex items-center gap-1.5 p-1.5 border border-transparent hover:border-white rounded cursor-pointer">
+        <span class="text-2xl font-black tracking-tight text-white flex items-center gap-1">
+          AuraZone<span class="text-amazonOrange text-xs font-bold uppercase tracking-widest bg-amazonLightNavy px-1 py-0.5 rounded ml-1">Health</span>
+        </span>
+      </a>
+
+      <!-- Deliver To Location -->
+      <div class="hidden lg:flex items-center gap-1.5 p-1.5 border border-transparent hover:border-white rounded cursor-pointer">
+        <i class="fa-solid fa-location-dot text-base text-slate-300"></i>
+        <div class="leading-tight">
+          <span class="text-slate-400 text-[11px] block">Deliver to</span>
+          <span class="font-bold text-white text-xs">Petaling Jaya 47810</span>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="flex-1 max-w-3xl relative">
+        <div class="flex rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-amazonOrange">
+          <div class="hidden sm:flex items-center px-3 bg-slate-200 text-slate-700 text-xs font-medium border-r border-slate-300">
+            <span>Health & Diet</span> <i class="fa-solid fa-caret-down ml-1 text-[10px]"></i>
+          </div>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search vitamins, omega 3, probiotics, electrolytes, organic supplements..." 
+            class="w-full px-3 py-2 text-slate-900 text-sm outline-none"
+            onkeyup="handleSearch(event)"
+          >
+          <button onclick="executeSearch()" class="bg-amazonYellow hover:bg-amazonOrange text-amazonNavy px-4 py-2 transition flex items-center justify-center">
+            <i class="fa-solid fa-magnifying-glass text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Nav Actions -->
+      <div class="flex items-center gap-2">
+        <!-- Admin Console / Login Status -->
+        <div id="navAdminControls" class="p-1.5 border border-transparent hover:border-white rounded cursor-pointer">
+          <button onclick="handleAdminNavClick()" class="text-left flex flex-col">
+            <span class="text-slate-300 text-[11px]" id="navAdminGreeting">Hello, Sign In</span>
+            <span class="font-bold text-white text-xs flex items-center gap-1" id="navAdminStatus">
+              Seller & Admin <i class="fa-solid fa-caret-down text-[10px]"></i>
+            </span>
+          </button>
+        </div>
+
+        <!-- Orders & Shipments -->
+        <button onclick="switchView('orders-list')" class="p-1.5 border border-transparent hover:border-white rounded text-left hidden sm:flex flex-col">
+          <span class="text-slate-300 text-[11px]">Returns</span>
+          <span class="font-bold text-white text-xs">& Orders</span>
+        </button>
+
+        <!-- Cart Icon -->
+        <button onclick="openCartModal()" class="p-1.5 border border-transparent hover:border-white rounded flex items-center gap-1.5 relative">
+          <div class="relative">
+            <i class="fa-solid fa-cart-shopping text-2xl text-white"></i>
+            <span id="cartCountBadge" class="absolute -top-1 -right-2 bg-amazonOrange text-slate-950 font-black text-[11px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
+          </div>
+          <span class="font-bold text-white text-xs mt-2 hidden md:inline">Cart</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sub Navigation Bar -->
+    <div class="bg-amazonLightNavy text-white text-xs px-4 py-1.5 flex items-center justify-between">
+      <div class="max-w-7xl mx-auto w-full flex items-center gap-4 overflow-x-auto scrollbar-hide">
+        <button onclick="filterCategory('All')" class="flex items-center gap-1 font-bold hover:text-amazonYellow whitespace-nowrap">
+          <i class="fa-solid fa-bars"></i> All Products
+        </button>
+        <span class="text-slate-500">|</span>
+        <button onclick="filterCategory('Vitamins & Minerals')" class="hover:text-amazonYellow whitespace-nowrap">Vitamins & Minerals</button>
+        <button onclick="filterCategory('Digestive Health')" class="hover:text-amazonYellow whitespace-nowrap">Digestive Health</button>
+        <button onclick="filterCategory('Joint & Mobility')" class="hover:text-amazonYellow whitespace-nowrap">Joint & Bone Care</button>
+        <button onclick="filterCategory('Immune Support')" class="hover:text-amazonYellow whitespace-nowrap">Immunity & Antioxidants</button>
+        <button onclick="filterCategory('Stress & Sleep')" class="hover:text-amazonYellow whitespace-nowrap">Stress & Sleep Well</button>
+        <button onclick="filterCategory('Cardio & Heart')" class="hover:text-amazonYellow whitespace-nowrap">Heart & Cardio</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+
+    <!-- VIEW 1: MARKETPLACE & CATALOG BROWSE (DEFAULT) -->
+    <section id="view-marketplace" class="space-y-6">
+      
+      <!-- Hero Banner -->
+      <div class="relative bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 rounded-xl overflow-hidden shadow text-white p-6 sm:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="max-w-xl space-y-2 z-10">
+          <span class="bg-amber-400 text-slate-950 text-[11px] font-black uppercase px-2.5 py-0.5 rounded tracking-wide inline-block">
+            Health & Wellness Deals
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Pharmaceutical-Grade Health, Vitamins & Daily Nutrition</h2>
+          <p class="text-xs sm:text-sm text-slate-300">Third-party tested dietary supplements, mineral blends, and active probiotics fulfilled directly from temperature-controlled warehouses.</p>
+          <div class="pt-2 flex gap-3">
+            <button onclick="filterCategory('All')" class="bg-amazonYellow hover:bg-amazonOrange text-slate-950 font-bold px-4 py-2 rounded-lg text-xs shadow transition">
+              Shop Top 10 Formulations
+            </button>
+            <button onclick="applyPromoVoucher('HEALTH20')" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2 rounded-lg text-xs border border-white/20 transition">
+              Use Coupon: HEALTH20
+            </button>
+          </div>
+        </div>
+        <div class="text-emerald-400/20 text-8xl md:text-9xl pointer-events-none">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+      </div>
+
+      <!-- Categories Pills -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+            <i class="fa-solid fa-filter text-amazonBlue"></i> Filter Formulations
+          </h3>
+          <span class="text-xs text-slate-400" id="filterStatusLabel">Showing All</span>
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-1" id="categoryFilterContainer">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="font-black text-slate-800 text-lg flex items-center gap-2" id="productsHeading">
+            <i class="fa-solid fa-capsules text-amazonOrange"></i> Featured Health Products (10 Listings)
+          </h3>
+          <span class="text-xs text-slate-500" id="productCountLabel">10 items available</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="productsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- VIEW 2: ADMIN & SELLER LOGIN PAGE -->
+    <section id="view-admin-login" class="hidden max-w-md mx-auto my-8">
+      <div class="bg-white p-8 rounded-2xl shadow-md border border-slate-200 space-y-5">
+        <div class="text-center space-y-1">
+          <h2 class="text-2xl font-black text-slate-900">AuraZone Seller Central</h2>
+          <p class="text-xs text-slate-500">Sign in to manage inventory, update admin profile, and track consignments</p>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-950 space-y-1">
+          <p class="font-bold flex items-center gap-1 text-amazonOrange"><i class="fa-solid fa-key"></i> Pre-Filled Admin Credentials:</p>
+          <div class="grid grid-cols-2 gap-2 mt-1">
+            <div>User: <code class="bg-white px-1.5 py-0.5 rounded font-mono font-bold text-slate-800 border">admin</code></div>
+            <div>Password: <code class="bg-white px-1.5 py-0.5 rounded font-mono font-bold text-slate-800 border">AuraZone@2026</code></div>
+          </div>
+          <button onclick="autofillAdminCredentials()" class="text-[11px] text-amazonLink hover:underline font-bold mt-1 block">
+            ⚡ Click here to autofill login
+          </button>
+        </div>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Email or Admin Username</label>
+            <input type="text" id="adminUserInput" required placeholder="admin" class="w-full px-3 py-2 border rounded-lg outline-none focus:border-amazonOrange text-sm">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Password</label>
+            <input type="password" id="adminPassInput" required placeholder="AuraZone@2026" class="w-full px-3 py-2 border rounded-lg outline-none focus:border-amazonOrange text-sm">
+          </div>
+          <div id="loginErrorMessage" class="hidden text-xs text-rose-600 bg-rose-50 p-2.5 rounded border border-rose-200">
+            Invalid credentials. Please use <code>admin</code> and <code>AuraZone@2026</code>.
+          </div>
+          <button type="submit" class="w-full bg-amazonYellow hover:bg-amazonOrange text-slate-950 font-bold py-2.5 rounded-lg shadow transition text-sm">
+            Sign In to Admin Dashboard
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW 3: ADMIN SELLER CONSOLE & PROFILE PAGE -->
+    <section id="view-admin-profile" class="hidden space-y-6">
+      
+      <!-- Header banner -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-amazonNavy text-amazonYellow flex items-center justify-center font-black text-2xl shadow">
+            AZ
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-black text-slate-900" id="displayAdminHeaderName">Marcus Sterling (Operations Lead)</h2>
+              <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-300">Verified Seller Account</span>
+            </div>
+            <p class="text-xs text-slate-500">Official Merchant ID: <span class="font-mono text-slate-700">AZ-MERCH-88201-MY</span> | Role: Platform Administrator</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="switchView('admin-products')" class="px-4 py-2 bg-amazonYellow hover:bg-amazonOrange text-slate-950 font-bold text-xs rounded-xl transition shadow flex items-center gap-1.5">
+            <i class="fa-solid fa-boxes-stacked"></i> Products Sold by Admin
+          </button>
+          <button onclick="switchView('orders-list')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-list-check"></i> Orders & Shipments
+          </button>
+          <button onclick="adminLogout()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-xl transition border border-rose-200 flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Profile Form & Details -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Editable Profile Information -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="border-b pb-3 flex items-center justify-between">
+            <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-id-card text-amazonBlue"></i> Admin & Seller Account Profile
+            </h3>
+            <span class="text-xs text-slate-400">Manage store identity & dispatch details</span>
+          </div>
+
+          <form onsubmit="saveAdminProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Full Legal Name</label>
+              <input type="text" id="profNameInput" required value="Marcus Sterling" class="w-full px-3 py-2 border rounded-lg outline-none focus:border-amazonOrange text-sm">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Official Contact Email</label>
+              <input type="email" id="profEmailInput" required value="admin@aurazone.com" class="w-full px-3 py-2 border rounded-lg outline-none focus:border-amazonOrange text-sm">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Phone Number (Support Hotline)</label>
+              <input type="text" id="profPhoneInput" required value="+60 3-7890 1234" class="w-full px-3 py-2 border rounded-lg outline-none focus:border-amazonOrange text-sm">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Company / Store Name</label>
+              <input type="text" id="profCompanyInput" required value="AuraZone Health & Pharma Logistics Sdn Bhd" class="w-full px-3 py-2 border rounded-lg outline-none focus:border-amazonOrange text-sm">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block font-bold text-slate-700 mb-1">Central Warehouse Physical Address</label>
+              <textarea id="profAddressInput" rows="2" class="w-full px-3 py-2 border rounded-lg outline-none focus:border-amazonOrange text-sm">Level 3, AuraZone Logistics Hub, Section 51A, 46100 Petaling Jaya, Selangor, Malaysia.</textarea>
+            </div>
+            <div class="sm:col-span-2 flex justify-end gap-2 pt-2">
+              <button type="submit" class="bg-amazonYellow hover:bg-amazonOrange text-slate-950 font-bold px-5 py-2 rounded-xl text-xs shadow transition">
+                <i class="fa-solid fa-floppy-disk mr-1"></i> Save Profile Details
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Quick Store Stats -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-base text-slate-900 border-b pb-3 mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-emerald-600"></i> Store Performance
+            </h3>
+            <div class="space-y-3 text-xs">
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Total Fulfilled Orders</span>
+                <span class="font-bold text-slate-800">5 Transactions</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Gross Sales Value</span>
+                <span class="font-bold text-slate-800">RM 1,215.30</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Seller Health Rating</span>
+                <span class="font-bold text-emerald-600">99.8% (Top Rated)</span>
+              </div>
+              <div class="flex justify-between py-1">
+                <span class="text-slate-500">Active Formulations Sold</span>
+                <span class="font-bold text-slate-800" id="adminActiveCount">10 Items</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="switchView('admin-products')" class="w-full py-2 bg-amazonLightNavy text-white hover:bg-amazonNavy rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-box-open"></i> Manage All Products Sold &rarr;
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- VIEW 4: PRODUCTS SOLD BY ADMIN / SELLER -->
+    <section id="view-admin-products" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+        
+        <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-200 gap-3">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-boxes-stacked text-amazonOrange"></i> Products Sold by AuraZone Admin
+            </h2>
+            <p class="text-xs text-slate-500">Complete catalog of health formulations published, managed, and fulfilled by your store.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="switchView('admin-profile')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition">
+              <i class="fa-solid fa-user"></i> Admin Profile
+            </button>
+            <button onclick="switchView('marketplace')" class="px-3.5 py-1.5 bg-amazonYellow hover:bg-amazonOrange text-slate-950 text-xs font-bold rounded-lg transition">
+              <i class="fa-solid fa-shop"></i> Storefront View
+            </button>
+          </div>
+        </div>
+
+        <!-- Add New Product Form Section -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-1.5">
+            <i class="fa-solid fa-plus-circle text-amazonBlue"></i> Add New Product to Seller Inventory
+          </h3>
+          <form onsubmit="handleAddNewAdminProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div class="md:col-span-2">
+              <label class="block font-bold text-slate-700 mb-1">Product Formulation Name</label>
+              <input type="text" id="newProdTitle" required placeholder="e.g., CoQ10 300mg Heart Energy" class="w-full p-2 border rounded bg-white outline-none focus:border-amazonOrange">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Category</label>
+              <select id="newProdCategory" class="w-full p-2 border rounded bg-white outline-none focus:border-amazonOrange">
+                <option value="Immune Support">Immune Support</option>
+                <option value="Cardio & Heart">Cardio & Heart</option>
+                <option value="Digestive Health">Digestive Health</option>
+                <option value="Joint & Mobility">Joint & Mobility</option>
+                <option value="Stress & Sleep">Stress & Sleep</option>
+                <option value="Vitamins & Minerals">Vitamins & Minerals</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Unit Price (RM)</label>
+              <input type="number" step="0.1" id="newProdPrice" required placeholder="89.00" class="w-full p-2 border rounded bg-white outline-none focus:border-amazonOrange">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Stock Count</label>
+              <input type="number" id="newProdStock" required placeholder="100" class="w-full p-2 border rounded bg-white outline-none focus:border-amazonOrange">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Dosage / Serving Size</label>
+              <input type="text" id="newProdDosage" placeholder="1 Capsule Daily (60 Count)" class="w-full p-2 border rounded bg-white outline-none focus:border-amazonOrange">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block font-bold text-slate-700 mb-1">Image URL</label>
+              <input type="url" id="newProdImg" placeholder="https://images.unsplash.com/..." class="w-full p-2 border rounded bg-white outline-none focus:border-amazonOrange">
+            </div>
+            <div class="md:col-span-4 flex justify-end">
+              <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
+                + Publish Product to Store
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Admin Products Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <tr>
+                <th class="p-3">Item ID</th>
+                <th class="p-3">Product Name & Category</th>
+                <th class="p-3">Serving Size</th>
+                <th class="p-3">Price (RM)</th>
+                <th class="p-3">Stock Units</th>
+                <th class="p-3">Fulfilled Sales</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminProductsTableBody" class="divide-y divide-slate-100">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 5: TRANSACTIONS & SHIPMENTS LIST (SAMPLE 5 ORDERS) -->
+    <section id="view-orders-list" class="hidden space-y-6">
+      
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b pb-4 mb-4">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-receipt text-amazonOrange"></i> Consignment & Order Records
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Verified merchant order logs. <strong>Click any Order ID</strong> to view itemized invoice or <strong>click any Tracking ID</strong> for the delivery timeline.
+            </p>
+          </div>
+          <button onclick="switchView('marketplace')" class="text-xs text-amazonLink hover:underline font-bold flex items-center gap-1">
+            <i class="fa-solid fa-arrow-left"></i> Return to Shopping
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+              <tr>
+                <th class="p-3">Order ID (Clickable)</th>
+                <th class="p-3">Shipment / Tracking No (Clickable)</th>
+                <th class="p-3">Date</th>
+                <th class="p-3">Customer</th>
+                <th class="p-3">Products Purchased</th>
+                <th class="p-3">Total Amount</th>
+                <th class="p-3">Fulfillment Status</th>
+                <th class="p-3 text-right">Details</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody" class="divide-y divide-slate-100">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL 1: PRODUCT DETAILS ================= -->
+  <div id="productDetailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
+      
+      <div class="md:w-1/2 bg-slate-100 p-6 flex flex-col items-center justify-center relative">
+        <img id="detailImg" src="" alt="Product" class="max-h-72 w-full object-contain rounded-xl">
+        <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[11px] font-black px-2 py-0.5 rounded">
+          Quality Verified
+        </span>
+      </div>
+
+      <div class="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
+        <div>
+          <div class="flex justify-between items-start">
+            <span id="detailCategory" class="text-[10px] uppercase font-bold tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+              Category
+            </span>
+            <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <h3 id="detailTitle" class="text-lg font-black text-slate-900 mt-2 leading-snug">Product Name</h3>
+          
+          <div class="flex items-center gap-2 mt-2 text-xs text-slate-600">
+            <div class="text-amber-500 font-bold flex items-center">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <span id="detailRatingVal" class="font-bold text-slate-800">4.9</span>
+            <span>|</span>
+            <span id="detailRatingsCount" class="text-amazonLink">840 ratings</span>
+          </div>
+
+          <div class="my-3 flex items-baseline gap-2">
+            <span id="detailPrice" class="text-2xl font-black text-slate-900">RM 0.00</span>
+            <span id="detailOrigPrice" class="text-xs text-slate-400 line-through">RM 0.00</span>
+          </div>
+
+          <p id="detailDescription" class="text-xs text-slate-600 leading-relaxed mb-4">
+            Product description details.
+          </p>
+
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1 mb-4">
+            <div class="flex justify-between"><span class="text-slate-500">Serving Size:</span> <span id="detailDosage" class="font-semibold text-slate-800">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Unit Stock Remaining:</span> <span id="detailStock" class="font-semibold text-emerald-600">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Seller / Lab:</span> <span class="font-semibold text-slate-800">AuraZone Central Hub</span></div>
+          </div>
+
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-xs font-bold text-slate-700">Quantity:</span>
+            <div class="flex items-center border rounded-lg bg-white">
+              <button onclick="changeDetailQty(-1)" class="px-3 py-1 text-slate-500 hover:bg-slate-100 font-bold">-</button>
+              <input type="number" id="detailQtyInput" value="1" min="1" class="w-12 text-center text-xs font-bold outline-none" readonly>
+              <button onclick="changeDetailQty(1)" class="px-3 py-1 text-slate-500 hover:bg-slate-100 font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200">
+          <button onclick="addToCartFromDetail()" class="py-2.5 px-4 bg-amazonYellow hover:bg-amazonOrange text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+          </button>
+          <button onclick="buyNowFromDetail()" class="py-2.5 px-4 bg-amazonOrange hover:bg-amazonOrangeHover text-white font-bold rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 2: ORDER INVOICE DETAILS ================= -->
+  <div id="orderDetailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      
+      <div class="bg-amazonNavy text-white p-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-amazonYellow text-lg"></i>
+          <div>
+            <h3 class="font-bold text-base flex items-center gap-2">
+              Order Receipt <span id="modalOrderCode" class="text-amazonYellow font-mono">#ORD-00000</span>
+            </h3>
+            <p class="text-[11px] text-slate-300" id="modalOrderDate">Date: 2026-10-10</p>
+          </div>
+        </div>
+        <button onclick="closeOrderDetailsModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 text-xs">
+        
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <span class="text-slate-500 block">Status:</span>
+            <span id="modalOrderStatusBadge" class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block mt-0.5">Delivered</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block">Assigned Courier:</span>
+            <span id="modalOrderCourier" class="font-bold text-slate-800">DHL Express</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block">Shipment ID:</span>
+            <button id="modalOrderTrackingBtn" class="font-mono font-bold text-amazonLink hover:underline flex items-center gap-1">
+              <span id="modalOrderTracking">TRK-00000</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="border p-3 rounded-xl space-y-1">
+            <span class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Recipient</span>
+            <p class="font-bold text-slate-900" id="modalBuyerName">Customer Name</p>
+            <p class="text-slate-500" id="modalBuyerPhone">012-3456789</p>
+          </div>
+          <div class="border p-3 rounded-xl space-y-1">
+            <span class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Delivery Address</span>
+            <p class="text-slate-700" id="modalShippingAddress">Address</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-800 mb-2">Itemized Products</h4>
+          <div class="border rounded-xl overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 text-slate-600 font-semibold border-b">
+                <tr>
+                  <th class="p-2.5">Item</th>
+                  <th class="p-2.5 text-center">Qty</th>
+                  <th class="p-2.5 text-right">Unit Price</th>
+                  <th class="p-2.5 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody id="modalOrderItemsBody" class="divide-y divide-slate-100">
+                <!-- Injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1 text-xs">
+          <div class="flex justify-between text-slate-600"><span>Subtotal:</span> <span id="modalSubtotal" class="font-semibold">RM 0.00</span></div>
+          <div class="flex justify-between text-slate-600"><span>Shipping & Handling:</span> <span id="modalShippingFee" class="font-semibold">RM 4.90</span></div>
+          <div class="flex justify-between text-slate-900 font-black text-sm pt-2 border-t"><span>Total Amount Paid:</span> <span id="modalGrandTotal" class="text-amazonOrange">RM 0.00</span></div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-100 border-t flex justify-end">
+        <button onclick="closeOrderDetailsModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 3: SHIPMENT TRACKING & TIMELINE ================= -->
+  <div id="shipmentTrackingModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      
+      <div class="bg-amazonNavy text-white p-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-amazonYellow text-amazonNavy flex items-center justify-center font-bold">
+            <i class="fa-solid fa-truck-fast"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm sm:text-base">Consignment Routing</h3>
+            <p class="text-[11px] text-slate-300">Live Cold-Chain Tracking & Delivery Progression</p>
+          </div>
+        </div>
+        <button onclick="closeShipmentTrackingModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="bg-slate-50 p-4 border-b flex flex-wrap justify-between items-center gap-2 text-xs">
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase font-bold">Consignment Number:</span>
+          <span id="trackingCodeDisplay" class="font-mono font-bold text-amazonBlue text-sm">TRK-00000</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase font-bold">Carrier:</span>
+          <span id="trackingCourierDisplay" class="font-bold text-slate-800">DHL Express</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase font-bold">Estimated Delivery:</span>
+          <span class="font-bold text-emerald-700">Next Business Day</span>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-100 border-b flex items-center justify-between text-center text-[10px] font-bold text-slate-600 px-6">
+        <div class="flex flex-col items-center">
+          <div class="w-7 h-7 rounded-full bg-amazonNavy text-white flex items-center justify-center mb-1"><i class="fa-solid fa-warehouse"></i></div>
+          <span>Dispatched</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-amazonOrange mx-1 -mt-3"></div>
+        <div class="flex flex-col items-center">
+          <div class="w-7 h-7 rounded-full bg-amazonNavy text-white flex items-center justify-center mb-1"><i class="fa-solid fa-network-wired"></i></div>
+          <span>Sort Facility</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-amazonOrange mx-1 -mt-3"></div>
+        <div class="flex flex-col items-center">
+          <div class="w-7 h-7 rounded-full bg-amazonOrange text-slate-950 flex items-center justify-center mb-1"><i class="fa-solid fa-truck"></i></div>
+          <span>Out for Delivery</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-slate-300 mx-1 -mt-3"></div>
+        <div class="flex flex-col items-center">
+          <div class="w-7 h-7 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center mb-1"><i class="fa-solid fa-house-chimney"></i></div>
+          <span>Delivered</span>
+        </div>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 max-h-80" id="trackingTimelineContainer">
+        <!-- Injected by JS -->
+      </div>
+
+      <div class="p-3 bg-slate-100 border-t flex justify-end">
+        <button onclick="closeShipmentTrackingModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs">
+          Close Tracking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 4: SHOPPING CART ================= -->
+  <div id="cartModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      
+      <div class="bg-amazonNavy text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-base flex items-center gap-2">
+          <i class="fa-solid fa-cart-shopping text-amazonYellow"></i> Your Health Shopping Cart
+        </h3>
+        <button onclick="closeCartModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        <div id="cartItemsContainer" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+          <!-- Injected by JS -->
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Recipient Name</label>
+              <input type="text" id="orderBuyerName" value="Dr. Kevin Tan" class="w-full p-2 border rounded text-xs outline-none focus:border-amazonOrange">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Phone Number</label>
+              <input type="text" id="orderBuyerPhone" value="+60 12-889 4433" class="w-full p-2 border rounded text-xs outline-none focus:border-amazonOrange">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block font-bold text-slate-700 mb-1">Shipping Address</label>
+              <input type="text" id="orderAddress" value="No. 12, Jalan BU 3/1, Bandar Utama, 47800 Petaling Jaya, Selangor" class="w-full p-2 border rounded text-xs outline-none focus:border-amazonOrange">
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t pt-3 space-y-1 text-slate-600">
+          <div class="flex justify-between"><span>Items Subtotal:</span> <span id="cartSubtotal" class="font-bold text-slate-800">RM 0.00</span></div>
+          <div class="flex justify-between"><span>Insulated Courier Delivery:</span> <span class="font-bold text-slate-800">RM 5.00</span></div>
+          <div class="flex justify-between text-emerald-600"><span>Coupon Discount:</span> <span id="cartDiscount" class="font-bold">-RM 0.00</span></div>
+          <div class="flex justify-between text-slate-900 font-black text-sm pt-1 border-t"><span>Order Total:</span> <span id="cartGrandTotal" class="text-amazonOrange">RM 0.00</span></div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t flex justify-end gap-2">
+        <button onclick="closeCartModal()" class="px-4 py-2 border rounded-xl font-bold text-slate-600 hover:bg-slate-100">Cancel</button>
+        <button onclick="proceedToCheckout()" class="px-6 py-2 bg-amazonYellow hover:bg-amazonOrange text-slate-950 font-black rounded-xl shadow flex items-center gap-1.5">
+          <i class="fa-solid fa-lock"></i> Place Your Order
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-amazonNavy text-white px-4 py-3 rounded-xl shadow-2xl z-50 text-xs sm:text-sm font-semibold hidden flex items-center gap-2.5 border border-slate-700">
+    <i class="fa-solid fa-circle-check text-amazonYellow text-base"></i>
+    <span id="toastMessage">Action completed</span>
+  </div>
+
+  <!-- ================= JAVASCRIPT STATE & APPLICATION LOGIC ================= -->
+  <script>
+    // ----------------------------------------------------
+    // 1. DATABASE: 10 HEALTH PRODUCT LISTINGS
+    // ----------------------------------------------------
+    let products = [
+      {
+        id: 'AZ-HLTH-001',
+        name: 'Liposomal Vitamin C 1500mg with Zinc & Rose Hips',
+        category: 'Immune Support',
+        price: 88.00,
+        originalPrice: 110.00,
+        rating: 4.9,
+        reviews: 1420,
+        dosage: '2 Capsules Daily (60 Servings)',
+        stock: 85,
+        soldCount: 320,
+        image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80',
+        description: 'Advanced liposomal absorption technology ensuring maximum bio-availability for immune defense, collagen synthesis, and antioxidant cellular support.'
+      },
+      {
+        id: 'AZ-HLTH-002',
+        name: 'Wild Alaskan Fish Oil Omega-3 1400mg (900mg EPA/DHA)',
+        category: 'Cardio & Heart',
+        price: 115.00,
+        originalPrice: 145.00,
+        rating: 4.8,
+        reviews: 2150,
+        dosage: '1 Softgel Daily (90 Softgels)',
+        stock: 120,
+        soldCount: 490,
+        image: 'https://images.unsplash.com/photo-1577401239170-897942555fb3?auto=format&fit=crop&w=600&q=80',
+        description: 'Molecularly distilled deep-sea cold-water fish oil certified free of heavy metals and PCBs. Supports cardiovascular health, brain focus, and inflammation reduction.'
+      },
+      {
+        id: 'AZ-HLTH-003',
+        name: 'Raw Multi-Strain 50 Billion CFU Probiotics & Prebiotics',
+        category: 'Digestive Health',
+        price: 95.00,
+        originalPrice: 125.00,
+        rating: 4.9,
+        reviews: 980,
+        dosage: '1 Acid-Resistant Capsule Daily (60 Count)',
+        stock: 64,
+        soldCount: 280,
+        image: 'https://images.unsplash.com/photo-1550572017-ed24058f62f3?auto=format&fit=crop&w=600&q=80',
+        description: '16 diverse active probiotic strains combined with organic prebiotic fiber to nourish intestinal flora, relieve bloating, and support gut barrier integrity.'
+      },
+      {
+        id: 'AZ-HLTH-004',
+        name: 'Glucosamine Sulfate 1500mg + Chondroitin & MSM Complex',
+        category: 'Joint & Mobility',
+        price: 105.00,
+        originalPrice: 135.00,
+        rating: 4.7,
+        reviews: 730,
+        dosage: '2 Tablets Daily (120 Tablets)',
+        stock: 90,
+        soldCount: 195,
+        image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?auto=format&fit=crop&w=600&q=80',
+        description: 'Triple-strength joint nourishment formula designed to rebuild cartilage, lubricate knees and shoulders, and relieve stiffness during mobility.'
+      },
+      {
+        id: 'AZ-HLTH-005',
+        name: 'Pure Magnesium Glycinate 400mg High Absorption for Relaxation',
+        category: 'Stress & Sleep',
+        price: 68.00,
+        originalPrice: 85.00,
+        rating: 4.9,
+        reviews: 1890,
+        dosage: '2 Veggie Capsules before Bed (120 Count)',
+        stock: 150,
+        soldCount: 510,
+        image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&w=600&q=80',
+        description: 'Chelated non-buffered magnesium glycinate formulated for gentle digestion, neuromuscular relaxation, reduction of night leg cramps, and deep restorative sleep.'
+      },
+      {
+        id: 'AZ-HLTH-006',
+        name: 'KSM-66 Organic Ashwagandha Root Extract 600mg + Black Pepper',
+        category: 'Stress & Sleep',
+        price: 79.00,
+        originalPrice: 99.00,
+        rating: 4.8,
+        reviews: 1120,
+        dosage: '1 Capsule Twice Daily (60 Count)',
+        stock: 75,
+        soldCount: 310,
+        image: 'https://images.unsplash.com/photo-1616671285442-127976c66657?auto=format&fit=crop&w=600&q=80',
+        description: 'Standardized full-spectrum root extract clinically studied to modulate cortisol response, support adrenal balance, and alleviate chronic mental fatigue.'
+      },
+      {
+        id: 'AZ-HLTH-007',
+        name: 'CoQ10 200mg (Ubiquinone) with BioPerine for Heart Energy',
+        category: 'Cardio & Heart',
+        price: 135.00,
+        originalPrice: 170.00,
+        rating: 4.9,
+        reviews: 650,
+        dosage: '1 Softgel with Meal (60 Softgels)',
+        stock: 45,
+        soldCount: 160,
+        image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&w=600&q=80',
+        description: 'Essential coenzyme supporting cellular ATP mitochondria energy production in the myocardium. Recommended for cardiovascular health and statin users.'
+      },
+      {
+        id: 'AZ-HLTH-008',
+        name: 'Vitamin D3 5000 IU + Vitamin K2 (MK-7) 100mcg in Coconut MCT Oil',
+        category: 'Vitamins & Minerals',
+        price: 62.00,
+        originalPrice: 80.00,
+        rating: 4.9,
+        reviews: 2400,
+        dosage: '1 Liquid Softgel Daily (120 Softgels)',
+        stock: 130,
+        soldCount: 680,
+        image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80',
+        description: 'Synergistic pairing of natural cholecalciferol with menaquinone-7 ensuring proper calcium absorption into bone matrix rather than soft arterial tissue.'
+      },
+      {
+        id: 'AZ-HLTH-009',
+        name: 'Hydrolyzed Marine Collagen Peptides Powder with Hyaluronic Acid',
+        category: 'Joint & Mobility',
+        price: 128.00,
+        originalPrice: 160.00,
+        rating: 4.8,
+        reviews: 820,
+        dosage: '1 Scoop Daily in Water or Coffee (300g)',
+        stock: 60,
+        soldCount: 220,
+        image: 'https://images.unsplash.com/photo-1550572017-ed24058f62f3?auto=format&fit=crop&w=600&q=80',
+        description: 'Type I & III wild-caught ocean collagen peptides formulated for skin hydration, fine-line reduction, tendon flexibility, and strengthened hair and nails.'
+      },
+      {
+        id: 'AZ-HLTH-010',
+        name: 'Organic Milk Thistle Extract 1000mg with 80% Silymarin',
+        category: 'Digestive Health',
+        price: 58.00,
+        originalPrice: 75.00,
+        rating: 4.7,
+        reviews: 540,
+        dosage: '1 Veggie Capsule Daily (120 Capsules)',
+        stock: 80,
+        soldCount: 175,
+        image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?auto=format&fit=crop&w=600&q=80',
+        description: 'Concentrated herbal hepatoprotective formula enriched with dandelion and artichoke extract to promote natural liver detox pathways and digestive vitality.'
+      }
+    ];
+
+    // ----------------------------------------------------
+    // 2. DATABASE: 5 SAMPLE TRANSACTIONS
+    // ----------------------------------------------------
+    let sampleOrders = [
+      {
+        orderId: 'AZ-ORD-10921',
+        shipmentNo: 'AZ-SHIP-882194',
+        date: '2026-10-11 10:30 AM',
+        buyerName: 'Dr. Kevin Tan',
+        buyerPhone: '+60 12-889 4433',
+        address: 'No. 12, Jalan BU 3/1, Bandar Utama, 47800 Petaling Jaya, Selangor',
+        courier: 'DHL Express Malaysia',
+        status: 'Delivered',
+        subtotal: 176.00,
+        shippingFee: 5.00,
+        total: 181.00,
+        items: [
+          { prodId: 'AZ-HLTH-001', name: 'Liposomal Vitamin C 1500mg', qty: 2, price: 88.00 }
+        ],
+        timeline: [
+          { time: '11 Oct 2026, 10:45 AM', location: 'AuraZone Central Hub, PJ', text: 'Order packaged in temperature-monitored seal.', status: 'done' },
+          { time: '11 Oct 2026, 02:30 PM', location: 'DHL Sorting Center Shah Alam', text: 'Package scanned and sorted into delivery line.', status: 'done' },
+          { time: '12 Oct 2026, 09:15 AM', location: 'Bandar Utama Regional Unit', text: 'Out for delivery with rider (Courier: Zulkifli).', status: 'done' },
+          { time: '12 Oct 2026, 11:30 AM', location: 'Buyer Residence', text: 'Delivered and signed by Dr. Kevin Tan.', status: 'done' }
+        ]
+      },
+      {
+        orderId: 'AZ-ORD-10922',
+        shipmentNo: 'AZ-SHIP-882195',
+        date: '2026-10-11 02:15 PM',
+        buyerName: 'Nurul Sarah',
+        buyerPhone: '+60 19-332 1100',
+        address: 'Unit 15-02, Menara Bangsar, Jalan Maarof, 59000 Kuala Lumpur',
+        courier: 'GDEX Priority Cargo',
+        status: 'Out for Delivery',
+        subtotal: 210.00,
+        shippingFee: 5.00,
+        total: 215.00,
+        items: [
+          { prodId: 'AZ-HLTH-002', name: 'Wild Alaskan Fish Oil Omega-3 1400mg', qty: 1, price: 115.00 },
+          { prodId: 'AZ-HLTH-003', name: 'Raw Multi-Strain 50B CFU Probiotics', qty: 1, price: 95.00 }
+        ],
+        timeline: [
+          { time: '11 Oct 2026, 02:40 PM', location: 'AuraZone Central Hub, PJ', text: 'Consignment packaged and sealed.', status: 'done' },
+          { time: '11 Oct 2026, 06:15 PM', location: 'GDEX Central Depot PJ', text: 'Departed sorting hub.', status: 'done' },
+          { time: '12 Oct 2026, 08:30 AM', location: 'Bangsar Delivery Depot', text: 'In delivery van to residential address.', status: 'active' },
+          { time: 'Expected Today', location: 'Menara Bangsar', text: 'Pending recipient handover.', status: 'pending' }
+        ]
+      },
+      {
+        orderId: 'AZ-ORD-10923',
+        shipmentNo: 'AZ-SHIP-882196',
+        date: '2026-10-10 09:00 AM',
+        buyerName: 'David Lee',
+        buyerPhone: '+60 16-778 9922',
+        address: 'No. 45, Jalan Setia Nusantara, Setia Alam, 40170 Shah Alam, Selangor',
+        courier: 'Pos Laju Express',
+        status: 'Delivered',
+        subtotal: 233.00,
+        shippingFee: 5.00,
+        total: 238.00,
+        items: [
+          { prodId: 'AZ-HLTH-004', name: 'Glucosamine Sulfate 1500mg Complex', qty: 1, price: 105.00 },
+          { prodId: 'AZ-HLTH-009', name: 'Hydrolyzed Marine Collagen Peptides', qty: 1, price: 128.00 }
+        ],
+        timeline: [
+          { time: '10 Oct 2026, 09:20 AM', location: 'AuraZone Central Hub, PJ', text: 'Consignment packed with desiccants.', status: 'done' },
+          { time: '10 Oct 2026, 01:00 PM', location: 'Pos Laju National Mail Centre', text: 'Sorted for Shah Alam zone.', status: 'done' },
+          { time: '11 Oct 2026, 10:15 AM', location: 'Setia Alam Delivery Branch', text: 'Delivered to resident mailbox / concierge.', status: 'done' }
+        ]
+      },
+      {
+        orderId: 'AZ-ORD-10924',
+        shipmentNo: 'AZ-SHIP-882197',
+        date: '2026-10-09 04:40 PM',
+        buyerName: 'Ameera Batrisyia',
+        buyerPhone: '+60 17-224 8877',
+        address: 'Villa 8, Presint 14, 62050 Putrajaya',
+        courier: 'DHL Express Malaysia',
+        status: 'In Transit',
+        subtotal: 282.00,
+        shippingFee: 5.00,
+        total: 287.00,
+        items: [
+          { prodId: 'AZ-HLTH-005', name: 'Pure Magnesium Glycinate 400mg', qty: 1, price: 68.00 },
+          { prodId: 'AZ-HLTH-006', name: 'KSM-66 Organic Ashwagandha', qty: 1, price: 79.00 },
+          { prodId: 'AZ-HLTH-007', name: 'CoQ10 200mg (Ubiquinone)', qty: 1, price: 135.00 }
+        ],
+        timeline: [
+          { time: '09 Oct 2026, 05:00 PM', location: 'AuraZone Central Hub, PJ', text: 'Package dispatched from warehouse loading deck.', status: 'done' },
+          { time: '10 Oct 2026, 03:00 AM', location: 'DHL Hub Puchong Gateway', text: 'Arrived at regional sortation facility.', status: 'done' },
+          { time: '12 Oct 2026, 07:00 AM', location: 'Putrajaya Courier Station', text: 'Sorting by route poscode.', status: 'active' },
+          { time: 'Expected Tomorrow', location: 'Presint 14, Putrajaya', text: 'Direct delivery handover.', status: 'pending' }
+        ]
+      },
+      {
+        orderId: 'AZ-ORD-10925',
+        shipmentNo: 'AZ-SHIP-882198',
+        date: '2026-10-08 11:15 AM',
+        buyerName: 'Chong Wei Lun',
+        buyerPhone: '+60 13-990 1234',
+        address: 'No. 88, Jalan Sutera 2, Taman Sutera Utama, 81300 Skudai, Johor',
+        courier: 'Line Clear Express',
+        status: 'Delivered',
+        subtotal: 289.00,
+        shippingFee: 5.00,
+        total: 294.30,
+        items: [
+          { prodId: 'AZ-HLTH-008', name: 'Vitamin D3 5000 IU + K2 MK-7', qty: 2, price: 62.00 },
+          { prodId: 'AZ-HLTH-007', name: 'CoQ10 200mg (Ubiquinone)', qty: 1, price: 135.00 },
+          { prodId: 'AZ-HLTH-010', name: 'Organic Milk Thistle Extract', qty: 1, price: 58.00 }
+        ],
+        timeline: [
+          { time: '08 Oct 2026, 11:30 AM', location: 'AuraZone Central Hub, PJ', text: 'Consignment barcode registered.', status: 'done' },
+          { time: '08 Oct 2026, 08:00 PM', location: 'Interstate Highway Freight', text: 'Dispatched to Johor Southern Logistics Hub.', status: 'done' },
+          { time: '09 Oct 2026, 02:30 PM', location: 'Johor Bahru Depot', text: 'Delivered and confirmed via recipient OTP.', status: 'done' }
+        ]
+      }
+    ];
+
+    // ----------------------------------------------------
+    // 3. ADMIN PROFILE STATE
+    // ----------------------------------------------------
+    let adminProfile = {
+      name: 'Marcus Sterling',
+      email: 'admin@aurazone.com',
+      phone: '+60 3-7890 1234',
+      company: 'AuraZone Health & Pharma Logistics Sdn Bhd',
+      address: 'Level 3, AuraZone Logistics Hub, Section 51A, 46100 Petaling Jaya, Selangor, Malaysia.'
+    };
+
+    let isAdminLoggedIn = false;
+    let cart = [];
+    let currentCategory = 'All';
+    let currentDetailProduct = null;
+
+    // ----------------------------------------------------
+    // 4. INITIALIZATION
+    // ----------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCategoryPills();
+      renderProductsGrid();
+      renderOrdersTable();
+      renderAdminProductsTable();
+      updateCartBadge();
+    });
+
+    // ----------------------------------------------------
+    // 5. VIEW NAVIGATION CONTROLLER
+    // ----------------------------------------------------
+    function switchView(viewName) {
+      document.getElementById('view-marketplace').classList.add('hidden');
+      document.getElementById('view-admin-login').classList.add('hidden');
+      document.getElementById('view-admin-profile').classList.add('hidden');
+      document.getElementById('view-admin-products').classList.add('hidden');
+      document.getElementById('view-orders-list').classList.add('hidden');
+
+      if (viewName === 'marketplace') {
+        document.getElementById('view-marketplace').classList.remove('hidden');
+      } else if (viewName === 'admin-login') {
+        document.getElementById('view-admin-login').classList.remove('hidden');
+      } else if (viewName === 'admin-profile') {
+        if (!isAdminLoggedIn) {
+          switchView('admin-login');
+          return;
+        }
+        document.getElementById('view-admin-profile').classList.remove('hidden');
+      } else if (viewName === 'admin-products') {
+        if (!isAdminLoggedIn) {
+          switchView('admin-login');
+          return;
+        }
+        document.getElementById('view-admin-products').classList.remove('hidden');
+        renderAdminProductsTable();
+      } else if (viewName === 'orders-list') {
+        document.getElementById('view-orders-list').classList.remove('hidden');
+        renderOrdersTable();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleAdminNavClick() {
+      if (isAdminLoggedIn) {
+        switchView('admin-profile');
+      } else {
+        switchView('admin-login');
+      }
+    }
+
+    // ----------------------------------------------------
+    // 6. PRODUCT CATALOG & CATEGORIES
+    // ----------------------------------------------------
+    const categories = ['All', 'Vitamins & Minerals', 'Digestive Health', 'Joint & Mobility', 'Immune Support', 'Stress & Sleep', 'Cardio & Heart'];
+
+    function renderCategoryPills() {
+      const container = document.getElementById('categoryFilterContainer');
+      container.innerHTML = categories.map(cat => `
+        <button onclick="filterCategory('${cat}')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
+          cat === currentCategory ? 'bg-amazonNavy text-amazonYellow shadow' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+        }">
+          ${cat}
+        </button>
+      `).join('');
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.getElementById('filterStatusLabel').innerText = `Category: ${cat}`;
+      document.getElementById('productsHeading').innerHTML = `<i class="fa-solid fa-capsules text-amazonOrange"></i> Health Formulations (${cat})`;
+      renderCategoryPills();
+      renderProductsGrid();
+      switchView('marketplace');
+    }
+
+    function renderProductsGrid(customItems = null) {
+      const container = document.getElementById('productsGrid');
+      let displayItems = customItems || products;
+
+      if (currentCategory !== 'All' && !customItems) {
+        displayItems = displayItems.filter(p => p.category === currentCategory);
+      }
+
+      document.getElementById('productCountLabel').innerText = `${displayItems.length} products available`;
+
+      if (displayItems.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400">
+            <i class="fa-solid fa-box-open text-4xl mb-2"></i>
+            <p class="text-sm">No health items matching your search.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = displayItems.map(p => `
+        <div class="bg-white rounded-xl border border-slate-200 hover:shadow-xl transition-all duration-200 overflow-hidden flex flex-col justify-between group cursor-pointer" onclick="openProductModal('${p.id}')">
+          <div>
+            <div class="aspect-square bg-slate-50 relative overflow-hidden flex items-center justify-center p-3">
+              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain group-hover:scale-105 transition duration-300">
+              <span class="absolute top-2 left-2 bg-amazonYellow text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded shadow">
+                PRIME
+              </span>
+            </div>
+            <div class="p-3 space-y-1">
+              <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">${p.category}</span>
+              <h4 class="font-bold text-xs text-slate-900 line-clamp-2 leading-snug group-hover:text-amazonBlue">
+                ${p.name}
+              </h4>
+              <div class="flex items-center gap-1 text-[11px] text-amber-500 pt-0.5">
+                <i class="fa-solid fa-star text-[10px]"></i>
+                <span class="font-bold text-slate-800">${p.rating}</span>
+                <span class="text-slate-400 text-[10px]">(${p.reviews})</span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-1.5">
+                <span class="text-base font-black text-slate-900">RM ${p.price.toFixed(2)}</span>
+                <span class="text-[11px] text-slate-400 line-through">RM ${p.originalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 pt-0">
+            <button onclick="event.stopPropagation(); quickAddToCart('${p.id}')" class="w-full py-1.5 bg-amber-400 hover:bg-amazonOrange text-slate-950 font-bold text-xs rounded-lg transition shadow-sm">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ----------------------------------------------------
+    // 7. ADMIN PRODUCTS SOLD / MANAGED INVENTORY
+    // ----------------------------------------------------
+    function renderAdminProductsTable() {
+      const tbody = document.getElementById('adminProductsTableBody');
+      document.getElementById('adminActiveCount').innerText = `${products.length} Items`;
+
+      tbody.innerHTML = products.map(p => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="p-3 font-mono font-bold text-slate-700">${p.id}</td>
+          <td class="p-3">
+            <div class="flex items-center gap-2">
+              <img src="${p.image}" class="w-8 h-8 rounded border object-contain bg-white">
+              <div>
+                <span class="font-bold text-slate-900 line-clamp-1">${p.name}</span>
+                <span class="text-[10px] text-slate-400">${p.category}</span>
+              </div>
+            </div>
+          </td>
+          <td class="p-3 text-slate-600">${p.dosage || 'Standard Serving'}</td>
+          <td class="p-3 font-bold text-slate-900">RM ${p.price.toFixed(2)}</td>
+          <td class="p-3 font-semibold ${p.stock < 50 ? 'text-rose-600' : 'text-emerald-700'}">${p.stock} units</td>
+          <td class="p-3 text-slate-700 font-bold">${p.soldCount || 100} units sold</td>
+          <td class="p-3 text-right">
+            <button onclick="deleteProduct('${p.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold p-1">
+              <i class="fa-solid fa-trash"></i> Remove
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function handleAddNewAdminProduct(e) {
+      e.preventDefault();
+      const title = document.getElementById('newProdTitle').value.trim();
+      const category = document.getElementById('newProdCategory').value;
+      const price = parseFloat(document.getElementById('newProdPrice').value);
+      const stock = parseInt(document.getElementById('newProdStock').value);
+      const dosage = document.getElementById('newProdDosage').value.trim() || '1 Capsule Daily (60 Count)';
+      let img = document.getElementById('newProdImg').value.trim();
+
+      if (!img) {
+        img = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80';
+      }
+
+      const newId = `AZ-HLTH-0${products.length + 1}`;
+      const newProd = {
+        id: newId,
+        name: title,
+        category: category,
+        price: price,
+        originalPrice: price * 1.25,
+        rating: 5.0,
+        reviews: 1,
+        dosage: dosage,
+        stock: stock,
+        soldCount: 0,
+        image: img,
+        description: `Pharmaceutical-grade formulation: ${title}. Certified by AuraZone Central Laboratory.`
+      };
+
+      products.unshift(newProd);
+      renderAdminProductsTable();
+      renderProductsGrid();
+      showToast(`Product "${title}" added to seller inventory!`);
+      e.target.reset();
+    }
+
+    function deleteProduct(prodId) {
+      if (confirm('Are you sure you want to remove this product formulation from inventory?')) {
+        products = products.filter(p => p.id !== prodId);
+        renderAdminProductsTable();
+        renderProductsGrid();
+        showToast('Product removed from active inventory.');
+      }
+    }
+
+    // ----------------------------------------------------
+    // 8. PRODUCT DETAIL MODAL CONTROLLER
+    // ----------------------------------------------------
+    function openProductModal(prodId) {
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      currentDetailProduct = prod;
+      document.getElementById('detailImg').src = prod.image;
+      document.getElementById('detailCategory').innerText = prod.category;
+      document.getElementById('detailTitle').innerText = prod.name;
+      document.getElementById('detailRatingVal').innerText = prod.rating;
+      document.getElementById('detailRatingsCount').innerText = `${prod.reviews} ratings`;
+      document.getElementById('detailPrice').innerText = `RM ${prod.price.toFixed(2)}`;
+      document.getElementById('detailOrigPrice').innerText = `RM ${prod.originalPrice.toFixed(2)}`;
+      document.getElementById('detailDescription').innerText = prod.description;
+      document.getElementById('detailDosage').innerText = prod.dosage;
+      document.getElementById('detailStock').innerText = `${prod.stock} units in stock`;
+      document.getElementById('detailQtyInput').value = 1;
+
+      document.getElementById('productDetailModal').classList.remove('hidden');
+    }
+
+    function closeProductModal() {
+      document.getElementById('productDetailModal').classList.add('hidden');
+    }
+
+    function changeDetailQty(delta) {
+      const input = document.getElementById('detailQtyInput');
+      let val = parseInt(input.value) + delta;
+      if (val < 1) val = 1;
+      if (currentDetailProduct && val > currentDetailProduct.stock) {
+        val = currentDetailProduct.stock;
+        showToast(`Stock limit: Maximum ${val} units allowed`);
+      }
+      input.value = val;
+    }
+
+    function addToCartFromDetail() {
+      if (!currentDetailProduct) return;
+      const qty = parseInt(document.getElementById('detailQtyInput').value);
+      addItemToCart(currentDetailProduct.id, qty);
+      closeProductModal();
+    }
+
+    function buyNowFromDetail() {
+      addToCartFromDetail();
+      openCartModal();
+    }
+
+    function quickAddToCart(prodId) {
+      addItemToCart(prodId, 1);
+    }
+
+    function addItemToCart(prodId, qty) {
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      const existing = cart.find(c => c.id === prodId);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ ...prod, qty });
+      }
+      updateCartBadge();
+      showToast(`Added to Cart: ${prod.name}`);
+    }
+
+    // ----------------------------------------------------
+    // 9. ORDERS & TRANSACTIONS (5 RECORDS)
+    // ----------------------------------------------------
+    function renderOrdersTable() {
+      const tbody = document.getElementById('ordersTableBody');
+      tbody.innerHTML = sampleOrders.map(o => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="p-3">
+            <button onclick="openOrderDetails('${o.orderId}')" class="font-bold font-mono text-amazonLink hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-file-invoice text-xs"></i> #${o.orderId}
+            </button>
+          </td>
+          <td class="p-3">
+            <button onclick="openShipmentTracking('${o.shipmentNo}')" class="group text-left px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 transition">
+              <span class="text-xs font-mono font-bold text-slate-800 flex items-center gap-1">
+                <i class="fa-solid fa-truck text-amazonOrange"></i> ${o.shipmentNo}
+              </span>
+              <span class="text-[10px] text-amazonLink block underline">View Timeline &rarr;</span>
+            </button>
+          </td>
+          <td class="p-3 text-slate-500 text-xs">${o.date}</td>
+          <td class="p-3">
+            <span class="font-bold text-slate-900 block">${o.buyerName}</span>
+            <span class="text-[10px] text-slate-400">${o.buyerPhone}</span>
+          </td>
+          <td class="p-3">
+            <span class="font-medium text-slate-800">${o.items[0]?.name}</span>
+            ${o.items.length > 1 ? `<span class="text-[10px] text-slate-400 block">+${o.items.length - 1} additional item(s)</span>` : ''}
+          </td>
+          <td class="p-3 font-black text-slate-900">RM ${o.total.toFixed(2)}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+              o.status === 'Delivered' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' :
+              o.status === 'Out for Delivery' ? 'bg-amber-100 text-amber-800 border border-amber-300' :
+              'bg-blue-100 text-blue-800 border border-blue-300'
+            }">
+              ${o.status}
+            </span>
+          </td>
+          <td class="p-3 text-right">
+            <button onclick="openOrderDetails('${o.orderId}')" class="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded">
+              Details
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ----------------------------------------------------
+    // 10. MODALS: ORDER INVOICE & TRACKING
+    // ----------------------------------------------------
+    function openOrderDetails(orderId) {
+      const order = sampleOrders.find(o => o.orderId === orderId);
+      if (!order) return;
+
+      document.getElementById('modalOrderCode').innerText = `#${order.orderId}`;
+      document.getElementById('modalOrderDate').innerText = `Date: ${order.date}`;
+      document.getElementById('modalOrderStatusBadge').innerText = order.status;
+      document.getElementById('modalOrderCourier').innerText = order.courier;
+      document.getElementById('modalOrderTracking').innerText = order.shipmentNo;
+
+      document.getElementById('modalOrderTrackingBtn').onclick = () => {
+        closeOrderDetailsModal();
+        openShipmentTracking(order.shipmentNo);
+      };
+
+      document.getElementById('modalBuyerName').innerText = order.buyerName;
+      document.getElementById('modalBuyerPhone').innerText = order.buyerPhone;
+      document.getElementById('modalShippingAddress').innerText = order.address;
+
+      const itemsBody = document.getElementById('modalOrderItemsBody');
+      itemsBody.innerHTML = order.items.map(it => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-2.5 font-medium text-slate-800">${it.name}</td>
+          <td class="p-2.5 text-center font-bold text-slate-800">${it.qty}</td>
+          <td class="p-2.5 text-right text-slate-600">RM ${it.price.toFixed(2)}</td>
+          <td class="p-2.5 text-right font-black text-slate-900">RM ${(it.price * it.qty).toFixed(2)}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('modalSubtotal').innerText = `RM ${order.subtotal.toFixed(2)}`;
+      document.getElementById('modalShippingFee').innerText = `RM ${order.shippingFee.toFixed(2)}`;
+      document.getElementById('modalGrandTotal').innerText = `RM ${order.total.toFixed(2)}`;
+
+      document.getElementById('orderDetailsModal').classList.remove('hidden');
+    }
+
+    function closeOrderDetailsModal() {
+      document.getElementById('orderDetailsModal').classList.add('hidden');
+    }
+
+    function openShipmentTracking(shipmentNo) {
+      const order = sampleOrders.find(o => o.shipmentNo === shipmentNo);
+      if (!order) return;
+
+      document.getElementById('trackingCodeDisplay').innerText = order.shipmentNo;
+      document.getElementById('trackingCourierDisplay').innerText = order.courier;
+
+      const container = document.getElementById('trackingTimelineContainer');
+      container.innerHTML = `
+        <div class="relative pl-6 space-y-4 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+          ${order.timeline.map(item => `
+            <div class="relative">
+              <div class="absolute -left-6 top-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] ${
+                item.status === 'done' ? 'bg-emerald-600 text-white' :
+                item.status === 'active' ? 'bg-amazonOrange text-slate-950 animate-pulse' :
+                'bg-slate-200 text-slate-400'
+              }">
+                <i class="fa-solid fa-check"></i>
+              </div>
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div class="flex justify-between items-center">
+                  <h5 class="font-bold text-xs text-slate-900">${item.location}</h5>
+                  <span class="text-[10px] text-slate-400 font-mono">${item.time}</span>
+                </div>
+                <p class="text-[11px] text-slate-600 mt-1 leading-snug">${item.text}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      document.getElementById('shipmentTrackingModal').classList.remove('hidden');
+    }
+
+    function closeShipmentTrackingModal() {
+      document.getElementById('shipmentTrackingModal').classList.add('hidden');
+    }
+
+    // ----------------------------------------------------
+    // 11. CART & ORDER PROCESSING
+    // ----------------------------------------------------
+    function updateCartBadge() {
+      const totalCount = cart.reduce((s, it) => s + it.qty, 0);
+      document.getElementById('cartCountBadge').innerText = totalCount;
+    }
+
+    function openCartModal() {
+      renderCartItems();
+      calculateCartTotal();
+      document.getElementById('cartModal').classList.remove('hidden');
+    }
+
+    function closeCartModal() {
+      document.getElementById('cartModal').classList.add('hidden');
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cartItemsContainer');
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-400">
+            <i class="fa-solid fa-cart-shopping text-3xl mb-1 text-slate-300"></i>
+            <p>Your shopping cart is currently empty.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = cart.map((item, idx) => `
+        <div class="flex items-center justify-between p-2.5 bg-slate-50 border rounded-xl">
+          <div class="flex items-center gap-3">
+            <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-contain bg-white rounded border">
+            <div>
+              <p class="font-bold text-slate-800 text-xs line-clamp-1">${item.name}</p>
+              <p class="text-[10px] text-slate-500">${item.dosage}</p>
+              <p class="text-xs font-black text-slate-900 mt-0.5">RM ${item.price.toFixed(2)}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center border bg-white rounded-lg">
+              <button onclick="changeCartQty(${idx}, -1)" class="px-2 py-0.5 text-xs font-bold text-slate-600">-</button>
+              <span class="px-2 text-xs font-bold">${item.qty}</span>
+              <button onclick="changeCartQty(${idx}, 1)" class="px-2 py-0.5 text-xs font-bold text-slate-600">+</button>
+            </div>
+            <button onclick="removeCartItem(${idx})" class="text-slate-400 hover:text-rose-600 text-sm">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function changeCartQty(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+      }
+      updateCartBadge();
+      renderCartItems();
+      calculateCartTotal();
+    }
+
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      updateCartBadge();
+      renderCartItems();
+      calculateCartTotal();
+    }
+
+    function calculateCartTotal() {
+      const subtotal = cart.reduce((s, it) => s + (it.price * it.qty), 0);
+      const shipping = cart.length > 0 ? 5.00 : 0.00;
+      const total = subtotal + shipping;
+
+      document.getElementById('cartSubtotal').innerText = `RM ${subtotal.toFixed(2)}`;
+      document.getElementById('cartGrandTotal').innerText = `RM ${total.toFixed(2)}`;
+    }
+
+    function proceedToCheckout() {
+      if (cart.length === 0) {
+        showToast('Cart is empty. Add health products first.');
+        return;
+      }
+
+      const buyerName = document.getElementById('orderBuyerName').value;
+      const buyerPhone = document.getElementById('orderBuyerPhone').value;
+      const address = document.getElementById('orderAddress').value;
+
+      const newOrderId = `AZ-ORD-${Math.floor(10000 + Math.random() * 90000)}`;
+      const newShipmentNo = `AZ-SHIP-${Math.floor(100000 + Math.random() * 900000)}`;
+      const subtotal = cart.reduce((s, it) => s + (it.price * it.qty), 0);
+
+      const newRecord = {
+        orderId: newOrderId,
+        shipmentNo: newShipmentNo,
+        date: new Date().toLocaleString('en-MY', { dateStyle: 'short', timeStyle: 'short' }),
+        buyerName,
+        buyerPhone,
+        address,
+        courier: 'DHL Express Malaysia',
+        status: 'In Transit',
+        subtotal,
+        shippingFee: 5.00,
+        total: subtotal + 5.00,
+        items: [...cart],
+        timeline: [
+          { time: 'Just Now', location: 'AuraZone Central Hub, PJ', text: 'Order confirmed and transferred to sorting line.', status: 'done' },
+          { time: 'Next 12 Hours', location: 'Regional Courier Hub', text: 'Cold packing in insulated thermal bubble wrap.', status: 'active' },
+          { time: 'Scheduled Tomorrow', location: address, text: 'Final delivery to recipient address.', status: 'pending' }
+        ]
+      };
+
+      sampleOrders.unshift(newRecord);
+      cart = [];
+      updateCartBadge();
+      closeCartModal();
+      showToast(`Order #${newOrderId} confirmed!`);
+      switchView('orders-list');
+    }
+
+    // ----------------------------------------------------
+    // 12. ADMIN AUTHENTICATION & PROFILE MANAGEMENT
+    // ----------------------------------------------------
+    function autofillAdminCredentials() {
+      document.getElementById('adminUserInput').value = 'admin';
+      document.getElementById('adminPassInput').value = 'AuraZone@2026';
+      document.getElementById('loginErrorMessage').classList.add('hidden');
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('adminUserInput').value.trim();
+      const p = document.getElementById('adminPassInput').value.trim();
+
+      if (u === 'admin' && p === 'AuraZone@2026') {
+        isAdminLoggedIn = true;
+        document.getElementById('navAdminGreeting').innerText = `Hello, ${adminProfile.name.split(' ')[0]}`;
+        document.getElementById('navAdminStatus').innerText = 'Admin Console';
+        showToast('Logged in to Admin Console!');
+        switchView('admin-profile');
+      } else {
+        document.getElementById('loginErrorMessage').classList.remove('hidden');
+      }
+    }
+
+    function adminLogout() {
+      isAdminLoggedIn = false;
+      document.getElementById('navAdminGreeting').innerText = 'Hello, Sign In';
+      document.getElementById('navAdminStatus').innerHTML = 'Seller & Admin <i class="fa-solid fa-caret-down text-[10px]"></i>';
+      showToast('Logged out of Admin Console.');
+      switchView('marketplace');
+    }
+
+    function saveAdminProfile(e) {
+      e.preventDefault();
+      adminProfile.name = document.getElementById('profNameInput').value.trim();
+      adminProfile.email = document.getElementById('profEmailInput').value.trim();
+      adminProfile.phone = document.getElementById('profPhoneInput').value.trim();
+      adminProfile.company = document.getElementById('profCompanyInput').value.trim();
+      adminProfile.address = document.getElementById('profAddressInput').value.trim();
+
+      document.getElementById('displayAdminHeaderName').innerText = `${adminProfile.name} (Operations Lead)`;
+      document.getElementById('navAdminGreeting').innerText = `Hello, ${adminProfile.name.split(' ')[0]}`;
+      showToast('Admin profile details updated successfully!');
+    }
+
+    // ----------------------------------------------------
+    // 13. SEARCH & SEARCH FILTER
+    // ----------------------------------------------------
+    function handleSearch(e) {
+      if (e.key === 'Enter') executeSearch();
+    }
+
+    function executeSearch() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      if (!q) {
+        renderProductsGrid();
+        return;
+      }
+      const matches = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+      renderProductsGrid(matches);
+      document.getElementById('productsHeading').innerHTML = `<i class="fa-solid fa-magnifying-glass text-amazonOrange"></i> Search Results: "${q}"`;
+      switchView('marketplace');
+    }
+
+    function applyPromoVoucher(code) {
+      showToast(`Voucher code "${code}" added to cart checkout!`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
